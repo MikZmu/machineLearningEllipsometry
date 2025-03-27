@@ -69,12 +69,21 @@ def on_release(key):
         actions.append(('key_release', key, time.time()))
 
 def execute():
+    total = len(aList) * len(bList) * len(cList) * len(tList)
+    progress = 0
     for A in aList:
         for B in bList:
             for C in cList:
                 for T in tList:
                     replay_actions(A, B, C, T)
                     time.sleep(0.5)  # Adjust the delay as needed
+                    progress = A * B * C * T
+                    print("Progress: {}/{}".format(progress, total))
+                    print("A: {}, B: {}, C: {}, T: {}".format(A, B, C, T))
+
+def delete():
+    for i in range(0, 100):
+        pyautogui.press("backspace")
 
 def replay_actions(A,B,C,T):
     print("replaying actions")
@@ -92,15 +101,20 @@ def replay_actions(A,B,C,T):
         elif action[0] == 'key_press':
             _, key, _ = action
             pyautogui.keyDown(key.char if hasattr(key, 'char') else key.name)
-            if key == keyboard.Key.A:
+            if key.char == "1":
+                delete()
                 pyautogui.typewrite(str(A))
-            if key == keyboard.Key.B:
+            if key.char == "2":
+                delete()
                 pyautogui.typewrite(str(B))
-            if key == keyboard.Key.C:
+            if key.char == "3":
+                delete()
                 pyautogui.typewrite(str(C))
-            if key == keyboard.Key.T:
+            if key.char == "4":
+                delete()
                 pyautogui.typewrite(str(T))
-            if key == keyboard.Key.n:
+            if key.char == "5":
+                delete()
                 pyautogui.typewrite(str(T) + "_" + str(A) + "_" + str(B*100) + "_" + str(C*1000))
 
 
@@ -116,6 +130,8 @@ while recording:
         print("Recording completed")
         if(recording == False):
             break
+
+
 
 print("check")
 
