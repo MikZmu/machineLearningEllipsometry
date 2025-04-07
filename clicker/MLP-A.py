@@ -62,24 +62,13 @@ from sklearn.metrics import r2_score
 class MLP(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(MLP, self).__init__()
-<<<<<<< Updated upstream
-        self.fc1 = nn.Linear(7, 64)
+        self.fc1 = nn.Linear(7, 128)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(64, 48)
-        self.fc3 = nn.Linear(48, 32)
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 32)
         self.fc4 = nn.Linear(32, 16)
         self.fc5 = nn.Linear(16, 8)
         self.fc0 = nn.Linear(8, 1)
-=======
-        self.fc1 = nn.Linear(7, 512)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(512, 256)
-        self.fc3 = nn.Linear(256, 128)
-        self.fc4 = nn.Linear(128, 64)
-        self.fc5 = nn.Linear(64, 32)
-        self.fc6 = nn.Linear(32, 16)
-        self.fc0 = nn.Linear(16, 1)
->>>>>>> Stashed changes
 
 
     def forward(self, x):
@@ -93,11 +82,6 @@ class MLP(nn.Module):
         out = self.relu(out)
         out = self.fc5(out)
         out = self.relu(out)
-<<<<<<< Updated upstream
-=======
-        out = self.fc6(out)
-        out = self.relu(out)
->>>>>>> Stashed changes
         out = self.fc0(out)
         return out
 
@@ -106,11 +90,7 @@ class MLP(nn.Module):
 input_size = 7
 hidden_size = 50
 output_size = 1
-<<<<<<< Updated upstream
-learning_rate = 0.0004
-=======
 learning_rate = 0.001
->>>>>>> Stashed changes
 
 # Create the model
 model = MLP(input_size, hidden_size, output_size)
@@ -128,7 +108,7 @@ def r2_loss(output, target):
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 # Dummy data (replace with your actual data)
-x_train, x_test , y_train, y_test = train_test_split(dataFrame[['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75']], dataFrame[['T']], test_size=0.2, random_state=42)
+x_train, x_test , y_train, y_test = train_test_split(dataFrame[['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75']], dataFrame[['A']], test_size=0.2, random_state=42)
 
 x_train = torch.from_numpy(x_train.values).float()
 x_test = torch.from_numpy(x_test.values).float()
@@ -151,20 +131,9 @@ while True:
     optimizer.step()
 
     clear_output(wait=True)
-<<<<<<< Updated upstream
-    print(f'Loss: {loss.item():.4f}')
-    print(f'Test loss: {testLoss.item():.4f}')
-=======
-    print(f'Loss: {loss.item():.8f}')
-    print(f'Test loss: {testLoss.item():.8f}')
->>>>>>> Stashed changes
+    print(f'Loss: {loss.item():.6f}')
+    print(f'Test loss: {testLoss.item():.6f}')
 
     if loss < bestLoss and testLoss<bestLoss*1.1:
         bestLoss = loss
-        torch.save(model.state_dict(), 'modelT.pth')
-<<<<<<< Updated upstream
-
-    if loss<0.001:
-        break
-=======
->>>>>>> Stashed changes
+        torch.save(model.state_dict(), 'modelA.pth')
