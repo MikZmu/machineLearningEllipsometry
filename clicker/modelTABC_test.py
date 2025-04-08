@@ -9,13 +9,12 @@ import torch.nn as nn
 class MLP(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(MLP, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc1 = nn.Linear(7, 32)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.fc3 = nn.Linear(hidden_size, hidden_size)
-        self.fc4 = nn.Linear(hidden_size, hidden_size)
-        self.fc5 = nn.Linear(hidden_size, hidden_size)
-        self.fc0 = nn.Linear(hidden_size, output_size)
+        self.fc2 = nn.Linear(32, 16)
+        self.fc3 = nn.Linear(16, 16)
+        self.fc4 = nn.Linear(16, 8)
+        self.fc0 = nn.Linear(8, 1)
 
 
     def forward(self, x):
@@ -26,8 +25,6 @@ class MLP(nn.Module):
         out = self.fc3(out)
         out = self.relu(out)
         out = self.fc4(out)
-        out = self.relu(out)
-        out = self.fc5(out)
         out = self.relu(out)
         out = self.fc0(out)
         return out
@@ -42,7 +39,7 @@ learning_rate = 0.001
 # Create the model
 model = MLP(input_size, hidden_size, output_size)
 
-model.load_state_dict(torch.load("modelTABC.pth"))
+model.load_state_dict(torch.load("modelT.pth"))
 
 model.eval()
 
@@ -69,17 +66,8 @@ for i in x:
         values.append(model(i))
 
 T = 0
-A = 0
-B = 0
-C = 0
 
 for i in values:
     T = T + i[0].item()
-    A = A + i[1].item()
-    B = B + i[2].item()
-    C = C + i[3].item()
 
 print(f'T: {T/len(values)}')
-print(f'A: {A/len(values)}')
-print(f'B: {B/len(values)}')
-print(f'C: {C/len(values)}')

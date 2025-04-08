@@ -1,3 +1,5 @@
+import time
+
 import epoch
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
@@ -54,6 +56,7 @@ for i in files:
 import torch
 import torch.nn as nn
 import torch.optim as optim
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 
@@ -62,12 +65,11 @@ from sklearn.metrics import r2_score
 class MLP(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(MLP, self).__init__()
-        self.fc1 = nn.Linear(7, 64)
+        self.fc1 = nn.Linear(7, 32)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(64, 48)
-        self.fc3 = nn.Linear(48, 32)
-        self.fc4 = nn.Linear(32, 16)
-        self.fc5 = nn.Linear(16, 8)
+        self.fc2 = nn.Linear(32, 16)
+        self.fc3 = nn.Linear(16, 16)
+        self.fc4 = nn.Linear(16, 8)
         self.fc0 = nn.Linear(8, 1)
 
 
@@ -80,8 +82,6 @@ class MLP(nn.Module):
         out = self.relu(out)
         out = self.fc4(out)
         out = self.relu(out)
-        out = self.fc5(out)
-        out = self.relu(out)
         out = self.fc0(out)
         return out
 
@@ -90,7 +90,7 @@ class MLP(nn.Module):
 input_size = 7
 hidden_size = 50
 output_size = 1
-learning_rate = 0.0004
+learning_rate = 0.002
 
 # Create the model
 model = MLP(input_size, hidden_size, output_size)
@@ -104,6 +104,7 @@ def r2_loss(output, target):
     r2 = 1 - ss_residual / ss_total
     return 1 - r2  # We return 1 - R² because we want to minimize the loss
 
+crit = nn.MSELoss()
 
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -114,29 +115,41 @@ x_train = torch.from_numpy(x_train.values).float()
 x_test = torch.from_numpy(x_test.values).float()
 y_train = torch.from_numpy(y_train.to_numpy(dtype=np.float32))
 y_test = torch.from_numpy(y_test.to_numpy(dtype=np.float32))
-
-
-loss = 10
-bestLoss = 10
+import matplotlib as plt
+from IPython.display import clear_output
+start_time = time.time()
+loss = 100000000
+bestLoss = 10000000
 # Training loop
 while True:
     # Forward pass
     outputs = model(x_train)
-    loss = r2_loss(outputs, y_train)
-    testLoss = r2_loss(model(x_test), y_test)
+    loss = crit(outputs, y_train)
+    testLoss = crit(model(x_test), y_test)
 
     # Backward pass and optimization
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
+    times = []
+    losses = []
+    elapsed_time = time.time() - start_time
+    times.append(elapsed_time)
+    losses.append(loss.item())
 
+    # Update the graph
     clear_output(wait=True)
+    plt.figure(figsize=(10, 5))
+    plt.plot(times, losses, label="Training Loss")
+    plt.xlabel("Time (seconds)")
+    plt.ylabel("Loss")
+    plt.title("Loss vs Time")
+    plt.legend()
+    plt.grid()
+    plt.show()
     print(f'Loss: {loss.item():.4f}')
     print(f'Test loss: {testLoss.item():.4f}')
 
     if loss < bestLoss and testLoss<bestLoss*1.5:
         bestLoss = loss
-        torch.save(model.state_dict(), 'modelT.pth')
-
-    if loss<0.001:
-        break
+        torch.save(model.state_dict(), 'modelT_7x32x16x16x8x1.pth')
