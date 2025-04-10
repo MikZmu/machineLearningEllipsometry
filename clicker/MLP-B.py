@@ -4,7 +4,6 @@ from sklearn.preprocessing import PolynomialFeatures
 import numpy as np
 from scipy.signal import find_peaks
 import os
-import numpy as np
 import pandas as pd
 from IPython.display import clear_output
 

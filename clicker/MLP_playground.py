@@ -1,5 +1,4 @@
 import torch
-from nbformat.v2 import nbformat_minor
 from torch import nn
 import MLP_class
 import  getData_class

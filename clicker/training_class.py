@@ -3,6 +3,7 @@ import time
 import torch
 import IPython
 from IPython.core.display_functions import clear_output
+from orca.orca_state import device
 
 
 def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, save_path):
@@ -24,6 +25,11 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
     times, losses = [], []
     plt.ion()
     fig, ax = plt.subplots(figsize=(10, 5))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model.to(device)
+    x_train, y_train = x_train.to(device), y_train.to(device)
+    x_test, y_test = x_test.to(device), y_test.to(device)
+
 
     while True:
         # Forward pass
