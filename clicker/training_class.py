@@ -7,19 +7,7 @@ from orca.orca_state import device
 
 
 def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, save_path):
-    """
-    Train the provided model and save it whenever the loss is lower than the previous best.
 
-    Args:
-        model (torch.nn.Module): The model to train.
-        loss_fn (callable): The loss function to use.
-        optimizer (torch.optim.Optimizer): The optimizer for training.
-        x_train (torch.Tensor): Training input data.
-        y_train (torch.Tensor): Training target data.
-        x_test (torch.Tensor): Test input data.
-        y_test (torch.Tensor): Test target data.
-        save_path (str): Path to save the model when a new best loss is achieved.
-    """
     best_loss = float('inf')
     start_time = time.time()
     times, losses = [], []
@@ -51,13 +39,11 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
         times.append(elapsed_time)
         losses.append(loss.item())
 
-        # Save the model if the loss is lower than the best loss
         if loss.item() < best_loss:
             best_loss = loss.item()
             torch.save(model.state_dict(), save_path)
             print(f"New best loss: {best_loss:.4f}. Model saved to {save_path}.")
 
-        # Update the graph
         """ax.clear()
         ax.plot(times, losses, label="Training Loss")
         ax.set_xlabel("Time (seconds)")
