@@ -23,9 +23,10 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
     best_loss = float('inf')
     start_time = time.time()
     times, losses = [], []
-    plt.ion()
-    fig, ax = plt.subplots(figsize=(10, 5))
+    """plt.ion()
+    fig, ax = plt.subplots(figsize=(10, 5))"""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(device)
     model = model.to(device)
     x_train, y_train = x_train.to(device), y_train.to(device)
     x_test, y_test = x_test.to(device), y_test.to(device)
@@ -42,6 +43,9 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
         loss.backward()
         optimizer.step()
 
+        #if scheduler:
+         #   scheduler.step(loss)
+
         # Record time and loss
         elapsed_time = time.time() - start_time
         times.append(elapsed_time)
@@ -54,13 +58,13 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
             print(f"New best loss: {best_loss:.4f}. Model saved to {save_path}.")
 
         # Update the graph
-        ax.clear()
+        """ax.clear()
         ax.plot(times, losses, label="Training Loss")
         ax.set_xlabel("Time (seconds)")
         ax.set_ylabel("Loss")
         ax.set_title("Loss vs Time")
         ax.legend()
         ax.grid()
-        plt.pause(0.01)  # Pause briefly to update the plot
+        plt.pause(0.01)  # Pause briefly to update the plot"""
 
-        print(f"Current Loss: {loss.item():.4f}, Test Loss: {test_loss.item():.4f}")
+        print(f"Current Loss: {loss.item():.8f}, Test Loss: {test_loss.item():.8f}")

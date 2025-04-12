@@ -1,4 +1,4 @@
 import torch
-torch.cuda.is_available()
+torch.cuda.memory_summary()
 
-print(torch.cuda.is_available())
+print(torch.cuda.memory_summary())
