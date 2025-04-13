@@ -59,3 +59,7 @@ def getData(target_columns=['T', 'A', 'B', 'C']):
     y_train = torch.from_numpy(y_train.to_numpy(dtype=np.float32))
     y_test = torch.from_numpy(y_test.to_numpy(dtype=np.float32))
     return [x_train, y_train, x_test, y_test]
+
+x = getData('T')
+
+print(x[1])

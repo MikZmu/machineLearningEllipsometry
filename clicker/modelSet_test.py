@@ -8,27 +8,27 @@ from sklearn.metrics import mean_squared_error
 
 
 modelT = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[128, 64, 64, 32])
-if(torch.cuda.is_available()):
-    modelT.load_state_dict(torch.load("modelT.pth"))
+if torch.cuda.is_available():
+    modelT.load_state_dict(torch.load("modelTx128x64x64x32.pth"))
 else:
-    modelT.load_state_dict(torch.load("modelT.pth", map_location=torch.device('cpu')))
+    modelT.load_state_dict(torch.load("modelTx128x64x64x32.pth", map_location=torch.device('cpu')))
 
 
 modelA = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[128, 64, 64, 32])
-if(torch.cuda.is_available()):
-    modelA.load_state_dict(torch.load("modelA.pth"))
+if torch.cuda.is_available():
+    modelA.load_state_dict(torch.load("modelAx128x64x64x32.pth"))
 else:
-    modelA.load_state_dict(torch.load("modelA.pth", map_location=torch.device('cpu')))
+    modelA.load_state_dict(torch.load("modelAx128x64x64x32.pth", map_location=torch.device('cpu')))
 
-modelB = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[128, 64, 64, 32])
+modelB = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[512, 512, 512, 512, 512])
 
-modelC = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[128, 64, 64, 32])
-if(torch.cuda.is_available()):
-    #modelC.load_state_dict(torch.load("modelC.pth"))
-    modelB.load_state_dict(torch.load("modelB.pth"))
+modelC = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[512, 512, 512, 512, 512])
+if torch.cuda.is_available():
+    modelC.load_state_dict(torch.load("modelC_512_512_512_512_512.pth"))
+    modelB.load_state_dict(torch.load("modelB_512_512_512_512_512.pth"))
 else:
-    #modelC.load_state_dict(torch.load("modelC.pth", map_location=torch.device('cpu')))
-    modelB.load_state_dict(torch.load("modelB.pth", map_location=torch.device('cpu')))
+    modelC.load_state_dict(torch.load("modelC_512_512_512_512_512.pth", map_location=torch.device('cpu')))
+    modelB.load_state_dict(torch.load("modelB_512_512_512_512_512.pth", map_location=torch.device('cpu')))
 
 
 
@@ -51,6 +51,8 @@ modelASetVal = []
 realASetVal = []
 modelBSetVal = []
 realBSetVal = []
+modelCSetVal = []
+realCSetVal = []
 
 for i in files:
         print(i)
@@ -94,6 +96,7 @@ for i in files:
                 tVal.append(modelT(i).item())
                 aVal.append(modelA(i).item())
                 bVal.append(modelB(i).item())
+                cVal.append(modelC(i).item())
 
 
         tS = 0
@@ -110,12 +113,17 @@ for i in files:
         for i in bVal:
             bS = bS + i
 
+        for i in cVal:
+            cS = cS + i
+
         modelTSetVal.append (tS / len(values))
         realTSetVal.append(T)
         modelASetVal.append(aS / len(values))
         realASetVal.append(A)
         modelBSetVal.append(bS / len(values))
         realBSetVal.append(B)
+        modelCSetVal.append(cS / len(values))
+        realCSetVal.append(C)
 
 modelTSetVal = list(map(float, modelTSetVal))
 realTSetVal = list(map(float, realTSetVal))
@@ -129,10 +137,12 @@ realBSetVal = list(map(float, realBSetVal))
 r2A = stats.pearsonr(modelASetVal, realASetVal)
 r2T = stats.pearsonr(modelTSetVal, realTSetVal)
 r2B = stats.pearsonr(modelBSetVal, realBSetVal)
+r2C = stats.pearsonr(modelCSetVal, realCSetVal)
 
 print("R2 dla T: " + str((float(r2T[0])**2)))
 print("R2 dla A: " + str((float(r2A[0])**2)))
 print("R2 dla B: " + str((float(r2B[0])**2)))
-print(mean_squared_error(modelBSetVal, realBSetVal))
+print("R2 dla C: " + str((float(r2C[0])**2)))
+
 
 

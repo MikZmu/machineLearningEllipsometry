@@ -12,7 +12,7 @@ random_y = y_train[random_index]
 
 model = MLP_class.MLP(input_size=7, output_size=4, hidden_layers=[ 64, 32, 32, 16])
 
-model.load_state_dict(torch.load('modelT.pth'))
+model.load_state_dict(torch.load('modelTx128x64x64x32.pth'))
 
 model.eval()
 

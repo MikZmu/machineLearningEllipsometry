@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import time
 import torch
@@ -7,7 +9,7 @@ from orca.orca_state import device
 
 
 def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, save_path):
-
+    os.environ['TERM'] = 'xterm'
     best_loss = float('inf')
     start_time = time.time()
     times, losses = [], []
@@ -18,6 +20,13 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
     model = model.to(device)
     x_train, y_train = x_train.to(device), y_train.to(device)
     x_test, y_test = x_test.to(device), y_test.to(device)
+
+    def r2_loss(y_pred, y_true):
+
+        ss_total = torch.sum((y_true - torch.mean(y_true)) ** 2)
+        ss_residual = torch.sum((y_true - y_pred) ** 2)
+        r2 = 1 - (ss_residual / ss_total)
+        return 1 - r2  # Loss is 1 - R²
 
 
     while True:
@@ -38,7 +47,7 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
         elapsed_time = time.time() - start_time
         times.append(elapsed_time)
         losses.append(loss.item())
-
+        os.system('clear')
         if loss.item() < best_loss:
             best_loss = loss.item()
             torch.save(model.state_dict(), save_path)
@@ -54,3 +63,4 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
         plt.pause(0.01)  # Pause briefly to update the plot"""
 
         print(f"Current Loss: {loss.item():.8f}, Test Loss: {test_loss.item():.8f}")
+        print(f"Current R2 Loss: {r2_loss(outputs, y_train).item():.8f}, Test R2 Loss: {r2_loss(model(x_test), y_test).item():.8f}")
