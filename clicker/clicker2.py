@@ -3,6 +3,8 @@ import pyautogui
 import time
 import random
 
+from pynput import mouse, keyboard
+
 aLower = 1.350
 aUpper = 1.550
 aStep = 0.05
@@ -103,39 +105,65 @@ def execute():
 # pyautogui.click(x, y) kliknięcie na miejsce
 # time.sleep() opóźnienie
 # pyautogui.typewrite() wpisanie tekstu
+coords = [[]]
 
+i = 0
+
+def on_click(x, y, button, pressed):
+    global i
+    if pressed:
+        print(x,y)
+        coords.append([x, y])
+        print(i)
+        i = i + 1
+
+
+
+
+
+
+mouse_listener = mouse.Listener(on_click=on_click)
+mouse_listener.start()
+
+
+
+
+while i < 14:
+    time.sleep(1)
+
+mouse_listener.stop()
 
 for x in sets:
-    pyautogui.click(105, 173)
+    pyautogui.click(coords[1][0], coords[1][1])
     time.sleep(0.1)
-    pyautogui.doubleClick(537, 482)
+    pyautogui.doubleClick(coords[2][0], coords[2][1])
     delete()
     pyautogui.typewrite(str(x[0])[:6])
-    pyautogui.doubleClick(564, 547)
+    pyautogui.doubleClick(coords[3][0], coords[3][1])
     delete()
     pyautogui.typewrite(str(x[1])[:6])
-    pyautogui.doubleClick(565, 635)
+    pyautogui.doubleClick(coords[4][0], coords[4][1])
     delete()
     pyautogui.typewrite(str(x[2])[:6])
-    pyautogui.doubleClick(766, 491)
+    pyautogui.doubleClick(coords[5][0], coords[5][1])
     delete()
     pyautogui.typewrite(str(x[3])[:6])
-    pyautogui.click(301, 658)
-    pyautogui.rightClick(62, 561)
-    pyautogui.click(178, 647)
+    pyautogui.click(coords[6][0], coords[6][1])
+    pyautogui.rightClick(coords[7][0], coords[7][1])
+    pyautogui.click(coords[8][0], coords[8][1])
     time.sleep(0.1)
-    pyautogui.rightClick(730  , 617)
+    pyautogui.rightClick(coords[9][0], coords[9][1])
     time.sleep(0.1)
-    pyautogui.click(849, 759)
+    pyautogui.click(coords[10][0], coords[10][1])
     time.sleep(0.1)
-    pyautogui.click(1270, 851)
+    pyautogui.click(coords[11][0], coords[11][1])
     time.sleep(0.1)
-    pyautogui.click(833, 889)
+    pyautogui.click(coords[12][0], coords[12][1])
     time.sleep(0.2)
     #pyautogui.click(879, 834)
     #   time.sleep(1)
     pyautogui.typewrite(str(x[0])[:6] + "_" + str(x[1])[:6] + "_" + str(x[2])[:6] + "_" + str(x[3])[:6])
-    pyautogui.click(936, 786)
-    pyautogui.click(1167, 913)
+    pyautogui.click(coords[13][0], coords[13][1])
+    pyautogui.click(coords[14][0], coords[14][1])
 
     time.sleep(0.2)
