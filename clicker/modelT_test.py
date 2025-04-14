@@ -39,9 +39,9 @@ output_size = 4
 learning_rate = 0.001
 
 # Create the model
-model = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[128, 64, 64, 32])
+model = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[1024, 1024, 1024, 1024, 1024, 1024, 1024])
 
-model.load_state_dict(torch.load("modelBB.pth"))
+model.load_state_dict(torch.load("modelB_1024_1024_1024_1024_1024_1024_1024.pth"))
 
 model.eval()
 
