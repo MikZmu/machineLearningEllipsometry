@@ -5,8 +5,8 @@ class MLP(nn.Module):
     def __init__(self, input_size, output_size, hidden_layers, activation_fn=nn.ReLU):
 
         super(MLP, self).__init__()
-        if len(hidden_layers) > 5:
-            raise ValueError("The number of hidden layers cannot exceed 5.")
+        if len(hidden_layers) > 7:
+            raise ValueError("The number of hidden layers cannot exceed 7.")
 
         self.layers = nn.ModuleList()
         prev_size = input_size

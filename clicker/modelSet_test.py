@@ -20,15 +20,15 @@ if torch.cuda.is_available():
 else:
     modelA.load_state_dict(torch.load("modelAx128x64x64x32.pth", map_location=torch.device('cpu')))
 
-modelB = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[512, 512, 512, 512, 512])
+modelB = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[1024, 1024, 1024, 1024, 1024, 1024, 1024])
 
-modelC = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[512, 512, 512, 512, 512])
+modelC = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[1024, 1024, 1024, 1024, 1024, 1024, 1024])
 if torch.cuda.is_available():
-    modelC.load_state_dict(torch.load("modelC_512_512_512_512_512.pth"))
-    modelB.load_state_dict(torch.load("modelB_512_512_512_512_512.pth"))
+    modelC.load_state_dict(torch.load("modelC_1024_1024_1024_1024_1024_1024_1024.pth"))
+    modelB.load_state_dict(torch.load("modelB_1024_1024_1024_1024_1024_1024_1024.pth"))
 else:
-    modelC.load_state_dict(torch.load("modelC_512_512_512_512_512.pth", map_location=torch.device('cpu')))
-    modelB.load_state_dict(torch.load("modelB_512_512_512_512_512.pth", map_location=torch.device('cpu')))
+    modelC.load_state_dict(torch.load("modelC_1024_1024_1024_1024_1024_1024_1024.pth", map_location=torch.device('cpu')))
+    modelB.load_state_dict(torch.load("modelB_1024_1024_1024_1024_1024_1024_1024.pth", map_location=torch.device('cpu')))
 
 
 

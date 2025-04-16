@@ -39,11 +39,9 @@ output_size = 4
 learning_rate = 0.001
 
 # Create the model
-model = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[128, 64, 64, 32])
-if torch.cuda.is_available():
-    model.load_state_dict(torch.load("modelTx128x64x64x32.pth"))
-else:
-    model.load_state_dict(torch.load("modelTx128x64x64x32.pth", map_location=torch.device('cpu')))
+model = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[1024, 1024, 1024, 1024, 1024, 1024, 1024])
+
+model.load_state_dict(torch.load("modelB_1024_1024_1024_1024_1024_1024_1024.pth"))
 
 model.eval()
 
@@ -97,7 +95,7 @@ for i in values:
     T = T + i
 
 print(f'T: {T/len(values)}')
-reals = dataHelper["T"].tolist()
+reals = dataHelper["B"].tolist()
 reals = list(map(float, reals))
 
 
@@ -113,3 +111,9 @@ plt.title('Comparison of Predicted and Real Values')
 plt.legend()
 plt.grid(True)
 plt.show()
+
+
+reals_with_noise = [real + random.uniform(1e-12, 1e-11) for real in reals]
+# Calculate the Pearson correlation coefficient
+correlation, _ = stats.pearsonr(values, reals_with_noise)
+print(f'Pearson correlation coefficient: {correlation:.2f}')
