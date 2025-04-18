@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 def getData(target_columns=['T', 'A', 'B', 'C']):
     project_folder = os.path.dirname(os.path.abspath(__file__))
-    folder_path = os.path.join(project_folder,"datasets", "Si_jaw_delta", "")
+    folder_path = os.path.join(project_folder,"datasets", "new_Si_jaw_delta", "")
     print(folder_path)
     os.makedirs(folder_path, exist_ok=True)
     all_items = os.listdir(folder_path)

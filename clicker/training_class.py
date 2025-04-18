@@ -33,7 +33,13 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
         # Forward pass
         outputs = model(x_train)
         loss = loss_fn(outputs, y_train)
-        test_loss = loss_fn(model(x_test), y_test)
+
+        test_pred = 0
+        with torch.no_grad():
+            test_pred = model(x_test)
+            test_loss = loss_fn(test_pred, y_test)
+            r2_test_loss = r2_loss(test_pred, y_test)
+
 
         # Backward pass and optimization
         optimizer.zero_grad()
@@ -63,4 +69,73 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
         plt.pause(0.01)  # Pause briefly to update the plot"""
 
         print(f"Current Loss: {loss.item():.8f}, Test Loss: {test_loss.item():.8f}")
-        print(f"Current R2 Loss: {r2_loss(outputs, y_train).item():.8f}, Test R2 Loss: {r2_loss(model(x_test), y_test).item():.8f}")
+        print(f"Current R2 Loss: {r2_loss(outputs, y_train).item():.8f}, Test R2 Loss: {r2_test_loss:.8f}")
+
+
+def train_conv_mlp(model, loss_fn, optimizer, x_train, y_train, x_val, y_val, save_path, epochs=100, patience=10):
+    """
+    Trains the ConvMLP model for regression.
+
+    Args:
+        model (nn.Module): The ConvMLP model.
+        loss_fn (nn.Module): Loss function (e.g., nn.MSELoss).
+        optimizer (torch.optim.Optimizer): Optimizer (e.g., Adam).
+        x_train (torch.Tensor): Training input data.
+        y_train (torch.Tensor): Training target data.
+        x_val (torch.Tensor): Validation input data.
+        y_val (torch.Tensor): Validation target data.
+        save_path (str): Path to save the best model.
+        epochs (int): Number of training epochs.
+        patience (int): Early stopping patience.
+
+    Returns:
+        None
+    """
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model.to(device)
+    x_train, y_train = x_train.to(device), y_train.to(device)
+    x_val, y_val = x_val.to(device), y_val.to(device)
+
+    best_loss = float('inf')
+    patience_counter = 0
+
+    def r2_score(y_pred, y_true):
+        ss_total = torch.sum((y_true - torch.mean(y_true)) ** 2)
+        ss_residual = torch.sum((y_true - y_pred) ** 2)
+        return 1 - (ss_residual / ss_total)
+
+    for epoch in range(epochs):
+        model.train()
+        optimizer.zero_grad()
+
+        # Forward pass
+        y_pred = model(x_train)
+        train_loss = loss_fn(y_pred, y_train)
+
+        # Backward pass
+        train_loss.backward()
+        optimizer.step()
+
+        # Validation
+        model.eval()
+        with torch.no_grad():
+            val_pred = model(x_val)
+            val_loss = loss_fn(val_pred, y_val)
+            val_r2 = r2_score(val_pred, y_val)
+
+        # Save the best model
+        if val_loss.item() < best_loss:
+            best_loss = val_loss.item()
+            torch.save(model.state_dict(), save_path)
+            print(f"Epoch {epoch + 1}: New best validation loss: {best_loss:.4f}. Model saved.")
+            patience_counter = 0
+        else:
+            patience_counter += 1
+
+        # Early stopping
+        if patience_counter >= patience:
+            print("Early stopping triggered.")
+            break
+
+        print(f"Epoch {epoch + 1}/{epochs}, Train Loss: {train_loss.item():.4f}, "
+              f"Val Loss: {val_loss.item():.4f}, Val R²: {val_r2:.4f}")
