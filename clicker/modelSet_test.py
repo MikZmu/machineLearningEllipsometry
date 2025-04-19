@@ -9,21 +9,46 @@ from scipy import stats
 from sklearn.metrics import mean_squared_error
 
 
+def decode_model(model):
+    model = model.removesuffix(".pth")
+    layers = model.split('_')
+    layers.pop(0)
+    return list(map(int, layers))
 
-modelT = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[48, 32, 16, 8])
+
+modelTT = ("modelT_48_32_16_8.pth")
+modelAA = "modelA_48_32_16_8.pth"
+modelBB = "modelB_256_256_256_128_64.pth"
+modelCC = "modelC_64_32_32_16.pth"
+modelBBstandard = "modelBstandard_64_32_32_16.pth"
+modelCCstandard = "modelCstandard_128_64_64_32.pth"
+modelT = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=decode_model(modelTT))
+modelA = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=decode_model(modelAA))
+modelB = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=decode_model(modelBB))
+
+modelBstandard = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=decode_model(modelBBstandard))
+modelCstandard = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=decode_model(modelCCstandard))
+
+bScaler = joblib.load("bScaler_featureScaler.pkl")
+bTargetScaler = joblib.load("bScaler_targetScaler.pkl")
+cTargetScaler = joblib.load("cScaler_targetScaler.pkl")
+cScaler = joblib.load("cScaler_featureScaler.pkl")
+
+
+
+
 if torch.cuda.is_available():
-    modelT.load_state_dict(torch.load("modelT_48_32_16_8.pth"))
+    modelT.load_state_dict(torch.load(modelTT))
 else:
-    modelT.load_state_dict(torch.load("modelT_48_32_16_8.pth", map_location=torch.device('cpu')))
+    modelT.load_state_dict(torch.load(modelTT, map_location=torch.device('cpu')))
 
 
-modelA = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[48, 32, 16, 8])
 if torch.cuda.is_available():
-    modelA.load_state_dict(torch.load("modelA_48_32_16_8.pth"))
+    modelA.load_state_dict(torch.load(modelAA))
 else:
-    modelA.load_state_dict(torch.load("modelA_48_32_16_8.pth", map_location=torch.device('cpu')))
+    modelA.load_state_dict(torch.load(modelAA, map_location=torch.device('cpu')))
 
-modelB = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[1024, 1024, 1024, 1024, 1024, 1024, 1024])
+
 
 modelBstandard = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[64, 32, 32, 16])
 modelCstandard = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[128, 64, 64, 32])
@@ -32,19 +57,16 @@ modelC = MLP_class.MLP(input_size=7, output_size=1, hidden_layers=[1024, 1024, 1
 if torch.cuda.is_available():
     #modelC.load_state_dict(torch.load("modelC_1024_1024_1024_1024_1024_1024_1024.pth"))
     #modelB.load_state_dict(torch.load("modelB_1024_1024_1024_1024_1024_1024_1024.pth"))
-    modelBstandard.load_state_dict(torch.load("modelBstandard_64_32_32_16.pth"))
-    modelCstandard.load_state_dict(torch.load("modelCstandard_128_64_64_32.pth"))
+    modelBstandard.load_state_dict(torch.load(modelBBstandard))
+    modelCstandard.load_state_dict(torch.load(modelCCstandard))
 else:
     #modelC.load_state_dict(torch.load("modelC_1024_1024_1024_1024_1024_1024_1024.pth", map_location=torch.device('cpu')))
     #modelB.load_state_dict(torch.load("modelB_1024_1024_1024_1024_1024_1024_1024.pth", map_location=torch.device('cpu')))
-    modelBstandard.load_state_dict(torch.load("modelBstandard_64_32_32_16.pth", map_location=torch.device('cpu')))
-    modelCstandard.load_state_dict(torch.load("modelCstandard_128_64_64_32.pth", map_location=torch.device('cpu')))
+    modelBstandard.load_state_dict(torch.load(modelBBstandard, map_location=torch.device('cpu')))
+    modelCstandard.load_state_dict(torch.load(modelCCstandard, map_location=torch.device('cpu')))
 
 
-bScaler = joblib.load("bScaler_featureScaler.pkl")
-bTargetScaler = joblib.load("bScaler_targetScaler.pkl")
-cTargetScaler = joblib.load("cScaler_targetScaler.pkl")
-cScaler = joblib.load("cScaler_featureScaler.pkl")
+
 
 
 project_folder = os.path.dirname(os.path.abspath(__file__))
@@ -85,7 +107,6 @@ for i in files:
         dataHelper['A'] = A
         dataHelper['B'] = B
         C = C.removesuffix(".txt")
-        print('x')
         if ("-" in C):
             C = C.removesuffix("e-")
             C = float(C) * 10 ** -5
@@ -108,15 +129,17 @@ for i in files:
         cStandardVal = []
 
         values = [[tVal,aVal,bVal,cVal]]
+        featureNames = ['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75']
 
         for a in x:
+            a_df = pd.DataFrame(a.numpy().reshape(1, -1), columns=featureNames)
             with torch.no_grad():
                 tVal.append(modelT(a).item())
                 aVal.append(modelA(a).item())
                 bVal.append(modelB(a).item())
                 cVal.append(modelC(a).item())
-                iBscaled = bScaler.transform(a.reshape(1,-1))
-                iCscaled = cScaler.transform(a.reshape(1,-1))
+                iBscaled = bScaler.transform(a_df)
+                iCscaled = cScaler.transform(a_df)
                 bStandardPred = modelBstandard(torch.from_numpy(iBscaled).float())
                 cStandardPred = modelCstandard(torch.from_numpy(iCscaled).float())
                 numpyBStandardPred = bStandardPred.detach().cpu().numpy()
