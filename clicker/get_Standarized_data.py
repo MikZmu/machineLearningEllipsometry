@@ -61,7 +61,7 @@ def get_Standarized_data(scalerName ,target_columns=['T', 'A', 'B', 'C']):
 
     targetScaler = StandardScaler()
 
-    standarized_targets = targetScaler.fit_transform(targets.to_frame())
+    standarized_targets = targetScaler.fit_transform(targets)
 
     joblib.dump(featureScaler, scalerName + '_featureScaler.pkl')
     joblib.dump(targetScaler, scalerName + '_targetScaler.pkl')

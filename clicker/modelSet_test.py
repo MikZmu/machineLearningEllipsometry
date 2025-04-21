@@ -149,6 +149,7 @@ for i in files:
                 bStandardVal.append(bInv.item())
                 cStandardVal.append(cInv.item())
 
+
         tS = 0
         aS = 0
         bS = 0

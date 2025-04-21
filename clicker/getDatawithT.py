@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-def getData(target_columns=['T', 'A', 'B', 'C']):
+def getData(target_columns=['A', 'B', 'C']):
     project_folder = os.path.dirname(os.path.abspath(__file__))
     folder_path = os.path.join(project_folder,"datasets", "new_Si_jaw_delta", "")
     print(folder_path)
@@ -49,21 +49,21 @@ def getData(target_columns=['T', 'A', 'B', 'C']):
         dataFrame = pd.concat([dataFrame, dataHelper], ignore_index=True)
 
     x_train, x_test, y_train, y_test = train_test_split(
-        dataFrame[['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75']],
+        dataFrame[['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75', 'T']],
         dataFrame[target_columns],
         test_size=0.2,
         random_state=42
     )
-    x_train = torch.from_numpy(x_train.values).float()
-    x_test = torch.from_numpy(x_test.values).float()
+    x_train = torch.from_numpy(x_train.to_numpy(dtype=np.float32))
+    x_test = torch.from_numpy(x_test.to_numpy(dtype=np.float32))
     y_train = torch.from_numpy(y_train.to_numpy(dtype=np.float32))
     y_test = torch.from_numpy(y_test.to_numpy(dtype=np.float32))
     return [x_train, y_train, x_test, y_test]
 
-x = getData('T')
+#x = getData('C')
 
 
-print(x[0].shape)
-print(x[1].shape)
-print(x[2].shape)
-print(x[3].shape)
+#print(x[0].shape)
+#print(x[1].shape)
+#print(x[2].shape)
+#print(x[3].shape)
