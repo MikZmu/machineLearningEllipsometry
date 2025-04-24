@@ -1,3 +1,4 @@
+import os.path
 import torch
 from torch import nn
 import MLP_class
@@ -5,18 +6,21 @@ import  getData_class
 import training_class
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import get_Standarized_data
-import getDatawithT
-import get_StandarizedWithTA
 
-model = MLP_class.MLP(input_size=9, output_size=1, hidden_layers=[32, 16, 16, 8])
-print(model)
 #data = getDatawithT.getData(['C'])
 #data = get_Standarized_data.get_Standarized_data("cScaler",'C')
-data = get_StandarizedWithTA.get_Standarized_data('CTAscaler', ['C'])
-#print(data)
-loss = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-#scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.9, patience=10)
-torch.cuda.empty_cache()
-training_class.train_model(model, loss, optimizer, x_train=data[0], y_train=data[1], x_test=data[2].squeeze(), y_test=data[3], save_path='modelCstandardwithTA_32_16_16_8.pth')
-
+path = os.path.dirname(os.path.abspath(__file__))
+pf = os.path.join(path, "..", "datasets", "new_Si_jaw_delta", "")
+data = getData_class.get_conv_data(['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75'], ['C'], pf)
+model = MLP_class.ConvMLP(input_channels=1, output_size=1,conv_layers = [(16,3,1,1), (32,3,1,1)] , fc_layers =[128, 64])
+training_class.train_conv_mlp(model,
+                              loss_fn=nn.MSELoss(),
+                              optimizer=torch.optim.Adam(model.parameters(), lr=0.001),
+                              x_train=data[0][0],
+                              y_train=data[0][1],
+                              x_val=data[1][0],
+                              y_val=data[1][1],
+                              save_path="modelC.pth",
+                              patience=1000000000000000,
+                              max_epochs=100000)
+print(model)

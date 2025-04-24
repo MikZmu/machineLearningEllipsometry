@@ -28,53 +28,41 @@ class MLP(nn.Module):
 
 class ConvMLP(nn.Module):
     def __init__(self, input_channels, output_size, conv_layers, fc_layers, activation_fn=nn.ReLU):
-        """
-        Constructs a Conv2d-based MLP for regression.
-
-        Args:
-            input_channels (int): Number of input channels for Conv2d.
-            output_size (int): Number of output features (regression target size).
-            conv_layers (list of tuples): Each tuple specifies (out_channels, kernel_size, stride, padding).
-            fc_layers (list of int): Number of neurons in each fully connected layer.
-            activation_fn (nn.Module): Activation function to use (default: nn.ReLU).
-        """
         super(ConvMLP, self).__init__()
 
+        # Convolutional layers
         self.conv_layers = nn.ModuleList()
         prev_channels = input_channels
-
-        # Create convolutional layers
         for out_channels, kernel_size, stride, padding in conv_layers:
             self.conv_layers.append(nn.Conv2d(prev_channels, out_channels, kernel_size, stride, padding))
-            self.conv_layers.append(activation_fn())  # Add activation function
+            self.conv_layers.append(activation_fn())
             prev_channels = out_channels
 
         self.flatten = nn.Flatten()
 
-        # Create fully connected layers
+        # Dynamically calculate the flattened size
+        with torch.no_grad():
+            dummy_input = torch.zeros(1, input_channels, 71, 7)  # Adjusted for single sample size
+            for layer in self.conv_layers:
+                dummy_input = layer(dummy_input)
+            flattened_size = dummy_input.numel()
+
+        # Fully connected layers
         self.fc_layers = nn.ModuleList()
-        prev_size = None  # To be determined dynamically after flattening
+        prev_size = flattened_size
         for neurons in fc_layers:
-            if prev_size is not None:
-                self.fc_layers.append(nn.Linear(prev_size, neurons))
+            self.fc_layers.append(nn.Linear(prev_size, neurons))
+            self.fc_layers.append(activation_fn())
             prev_size = neurons
-            self.fc_layers.append(activation_fn())  # Add activation function
 
         # Output layer
         self.output_layer = nn.Linear(prev_size, output_size)
 
     def forward(self, x):
-        # Pass through convolutional layers
         for layer in self.conv_layers:
             x = layer(x)
-
-        # Flatten the output
         x = self.flatten(x)
-
-        # Pass through fully connected layers
         for layer in self.fc_layers:
             x = layer(x)
-
-        # Output layer
         x = self.output_layer(x)
         return x

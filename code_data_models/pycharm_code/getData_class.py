@@ -37,8 +37,9 @@ def getData(feature_columns ,target_columns, folder):
         dataHelper['C'] = C
         dataFrame = pd.concat([dataFrame, dataHelper], ignore_index=True)
 
+    print(dataFrame.columns)
     x_train, x_test, y_train, y_test = train_test_split(
-        dataFrame[[feature_columns]],
+        dataFrame[feature_columns],
         dataFrame[target_columns],
         test_size=0.2,
         random_state=42
@@ -201,9 +202,15 @@ def get_conv_data(feature_columns, target_columns, folder):
         features = dataHelper[feature_columns]
         targets = dataHelper[target_columns]
 
+        # Convert to tensors
         features = torch.from_numpy(features.to_numpy(dtype=np.float32))
         targets = torch.from_numpy(targets.to_numpy(dtype=np.float32))
 
+        # Reshape features to (batch_size, input_channels, height, width)
+        features = features.view(-1, 1, 71, 7)  # Adjust height and width as needed
+        targets = targets.unsqueeze(1)  # Add channel dimension to targets
+
+        print(features.shape)  # Debugging: Check the shape
         dfList.append([features, targets])
 
     return dfList
