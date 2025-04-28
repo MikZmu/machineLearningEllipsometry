@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class MLP(nn.Module):
-    def __init__(self, input_size, output_size, hidden_layers, activation_fn=nn.ReLU):
+    def __init__(self, input_size, output_size, hidden_layers, activation_fn=nn.LeakyReLU):
 
         super(MLP, self).__init__()
         if len(hidden_layers) > 7:

@@ -20,7 +20,9 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
     model = model.to(device)
     if batch_size != 0:
         dataset = torch.utils.data.TensorDataset(x_train, y_train)
+        test_dataset = torch.utils.data.TensorDataset(x_test, y_test)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     else:
         x_train, y_train = x_train.to(device), y_train.to(device)
         x_test, y_test = x_test.to(device), y_test.to(device)
@@ -49,17 +51,13 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
 
             # Validation
             model.eval()
-            with torch.no_grad():
-                test_pred = model(x_test)
-                test_loss = loss_fn(test_pred, y_test)
-                r2_test_loss = r2_loss(test_pred, y_test)
 
             if loss.item() < best_loss:
                 best_loss = loss.item()
                 torch.save(model.state_dict(), save_path)
                 print(f"New best loss: {best_loss:.8f}. Model saved to {save_path}.")
-            print(f"Current Loss: {loss.item():.8f}, Test Loss: {test_loss.item():.8f}")
-            print(f"Current R2 Loss: {r2:.8f}, Test R2 Loss: {r2_test_loss:.8f}")
+            print(f"Current Loss: {loss.item():.8f}")
+            print(f"Current R2 Loss: {r2:.8f}")
 
     else:
         while True:
