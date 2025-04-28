@@ -5,12 +5,9 @@ import pandas as pd
 import torch
 import statistics
 
-project_folder = os.path.dirname(os.path.abspath(__file__))
-folder_path = os.path.join(project_folder,"datasets", "new_Si_jaw_delta", "")
-all_items = os.listdir(folder_path)
-files = [item for item in all_items if os.path.isfile(os.path.join(folder_path, item))]
 
-def extract_from_name(name):
+
+def extract_from_name(name, folder_path):
     dataHelper = pd.read_csv(folder_path + name, sep='\t', header=None, index_col=False)
     info = name.split('_')
     T = info[0]
@@ -100,12 +97,3 @@ def predict_scaled(file, model, scaler, targetscaler):
             values.append(pred.item())
 
     print(f"Model prediction: {statistics.median(values)}")
-
-
-
-
-
-
-predict("94.848_1.3902_0.01375279_0.00019072660000000002.txt", "modelT_48_32_16_8.pth")
-
-predict_scaled("94.848_1.3902_0.01375279_0.00019072660000000002.txt", "modelBstandard_96_48_24_12.pth", "bScaler_featureScaler.pkl", "bScaler_targetScaler.pkl")
