@@ -48,21 +48,19 @@ Bsdata = getData_class.get_Standarized_data("bScaler",["wavelength","psi65", "de
 
 def calculate_set_r2(model, x,y):
     model.eval()
-    with torch.no_grad():
-        pred = model(x)
-        pred = pred.flatten().tolist()
+    pred = model(x)
+    pred = pred.flatten().tolist()
     y= y.flatten().tolist()
     return (pearsonr(pred, y)[0]**2)
 
 def calculate_r2(model, data):
     model.eval()
-    with torch.no_grad():
-        predTrain = model(data[0])
-        predTrain = predTrain.flatten().tolist()
-        predTest = model(data[2])
-        predTest = predTest.flatten().tolist()
-        yTrain = data[1].flatten().tolist()
-        yTest = data[3].flatten().tolist()
+    predTrain = model(data[0])
+    predTrain = predTrain.flatten().tolist()
+    predTest = model(data[2])
+    predTest = predTest.flatten().tolist()
+    yTrain = data[1].flatten().tolist()
+    yTest = data[3].flatten().tolist()
     return ([pearsonr(predTrain, yTrain)[0]**2, pearsonr(predTest, yTest)[0]**2])
 
 A_32_16_16_8 = create_and_load(model_folder, "modelA_32_16_16_8.pth", 7, 1)
