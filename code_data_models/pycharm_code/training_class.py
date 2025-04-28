@@ -50,7 +50,7 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
                 optimizer.step()
 
             # Validation
-            model.eval()
+            #model.eval()
 
             if loss.item() < best_loss:
                 best_loss = loss.item()
@@ -62,14 +62,12 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
     else:
         while True:
             # Forward pass
+            model.train()
             outputs = model(x_train)
             loss = loss_fn(outputs, y_train)
 
             test_pred = 0
-            with torch.no_grad():
-                test_pred = model(x_test)
-                test_loss = loss_fn(test_pred, y_test)
-                r2_test_loss = r2_loss(test_pred, y_test)
+
 
 
             # Backward pass and optimization
@@ -85,6 +83,14 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
             times.append(elapsed_time)
             losses.append(loss.item())
             os.system('clear')
+            model.eval()
+            with torch.no_grad():
+                test_pred = model(x_test)
+                test_loss = loss_fn(test_pred, y_test)
+                r2_test_loss = r2_loss(test_pred, y_test)
+
+
+
             if loss.item() < best_loss:
                 best_loss = loss.item()
                 torch.save(model.state_dict(), save_path)
