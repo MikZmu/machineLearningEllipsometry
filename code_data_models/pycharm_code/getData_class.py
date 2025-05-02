@@ -180,39 +180,5 @@ def get_standarized_chunks(feature_scaler, target_scaler, feature_columns, targe
 
     return dfList
 
-def get_conv_data(feature_columns, target_columns, folder):
-    all_items = os.listdir(folder)
-    files = [item for item in all_items if os.path.isfile(os.path.join(folder, item))]
-    dfList = []
-    for i in files:
-        dataHelper = pd.read_csv(folder + i, sep='\t', header=None, index_col=False)
-        info = i.split('_')
-        T = info[0]
-        A = info[1]
-        B = info[2]
-        C = info[3]
-        dataHelper = dataHelper.drop(index=[0])
-        dataHelper = dataHelper.drop(columns=[7])
-        dataHelper.columns = ['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75']
-        dataHelper['T'] = T
-        dataHelper['A'] = A
-        dataHelper['B'] = B
-        C = C.removesuffix(".txt")
-        dataHelper['C'] = C
-        features = dataHelper[feature_columns]
-        targets = dataHelper[target_columns]
-
-        # Convert to tensors
-        features = torch.from_numpy(features.to_numpy(dtype=np.float32))
-        targets = torch.from_numpy(targets.to_numpy(dtype=np.float32))
-
-        # Reshape features to (batch_size, input_channels, height, width)
-        features = features.view(-1, 1, 71, 7)  # Adjust height and width as needed
-        targets = targets.unsqueeze(1)  # Add channel dimension to targets
-
-        print(features.shape)  # Debugging: Check the shape
-        dfList.append([features, targets])
-
-    return dfList
 
 
