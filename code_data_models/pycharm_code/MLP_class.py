@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torch.nn as nn
 
@@ -25,44 +27,19 @@ class MLP(nn.Module):
             x = layer(x)
         return x
 
+    @staticmethod
+    def decode_model(model_path):
+        model = model_path.removesuffix(".pth")
+        layers = model.split('_')
+        layers.pop(0)
+        return list(map(int, layers))
 
-class ConvMLP(nn.Module):
-    def __init__(self, input_channels, output_size, conv_layers, fc_layers, activation_fn=nn.ReLU):
-        super(ConvMLP, self).__init__()
+    @staticmethod
+    def create_and_load(model_path, input_size, output_size):
+        model = MLP(input_size, output_size, hidden_layers=MLP.decode_model(model_path))
+        if torch.cuda.is_available():
+            model.load_state_dict(torch.load(model_path))
+        else:
+            model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        return model
 
-        # Convolutional layers
-        self.conv_layers = nn.ModuleList()
-        prev_channels = input_channels
-        for out_channels, kernel_size, stride, padding in conv_layers:
-            self.conv_layers.append(nn.Conv2d(prev_channels, out_channels, kernel_size, stride, padding))
-            self.conv_layers.append(activation_fn())
-            prev_channels = out_channels
-
-        self.flatten = nn.Flatten()
-
-        # Dynamically calculate the flattened size
-        with torch.no_grad():
-            dummy_input = torch.zeros(1, input_channels, 71, 7)  # Adjusted for single sample size
-            for layer in self.conv_layers:
-                dummy_input = layer(dummy_input)
-            flattened_size = dummy_input.numel()
-
-        # Fully connected layers
-        self.fc_layers = nn.ModuleList()
-        prev_size = flattened_size
-        for neurons in fc_layers:
-            self.fc_layers.append(nn.Linear(prev_size, neurons))
-            self.fc_layers.append(activation_fn())
-            prev_size = neurons
-
-        # Output layer
-        self.output_layer = nn.Linear(prev_size, output_size)
-
-    def forward(self, x):
-        for layer in self.conv_layers:
-            x = layer(x)
-        x = self.flatten(x)
-        for layer in self.fc_layers:
-            x = layer(x)
-        x = self.output_layer(x)
-        return x
