@@ -18,6 +18,7 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
     model = model.to(device)
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
     if batch_size != 0:
         dataset = torch.utils.data.TensorDataset(x_train, y_train)
         test_dataset = torch.utils.data.TensorDataset(x_test, y_test)
@@ -82,7 +83,7 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
             elapsed_time = time.time() - start_time
             times.append(elapsed_time)
             losses.append(loss.item())
-            os.system('clear')
+            #os.system('clear')
             model.eval()
             with torch.no_grad():
                 test_pred = model(x_test)
@@ -107,50 +108,3 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
 
             print(f"Current Loss: {loss.item():.8f}, Test Loss: {test_loss.item():.8f}")
             print(f"Current R2 Loss: {r2_loss(outputs, y_train).item():.8f}, Test R2 Loss: {r2_test_loss:.8f}")
-
-
-def train_conv_mlp(model, loss_fn, optimizer, x_train, y_train, x_val, y_val, save_path, patience=10, max_epochs=100):
-    best_val_loss = float('inf')
-    patience_counter = 0
-
-    def r2_loss(y_pred, y_true):
-
-        ss_total = torch.sum((y_true - torch.mean(y_true)) ** 2)
-        ss_residual = torch.sum((y_true - y_pred) ** 2)
-        r2 = 1 - (ss_residual / ss_total)
-        return 1 - r2  # Loss is 1 - R²
-    r2 = 9999999999999999
-
-    for epoch in range(max_epochs):
-        # Training phase
-        model.train()
-        optimizer.zero_grad()
-        y_pred = model(x_train)
-        train_loss = loss_fn(y_pred, y_train)
-        train_loss.backward()
-        optimizer.step()
-
-        # Validation phase
-        model.eval()
-        with torch.no_grad():
-            y_val_pred = model(x_val)
-            val_loss = loss_fn(y_val_pred, y_val)
-            r2 = r2_loss(y_val_pred, y_val)
-
-        print(f"Epoch {epoch+1}/{max_epochs}, Train Loss: {train_loss.item():.16f}, Val Loss: {val_loss.item():.16f}, R2 Loss: {r2:.16f}")
-
-        # Check for improvement
-        if val_loss.item() < best_val_loss:
-            best_val_loss = val_loss.item()
-            patience_counter = 0
-            torch.save(model.state_dict(), save_path)
-            print(f"Model saved with Val Loss: {best_val_loss:.4f}")
-        else:
-            patience_counter += 1
-
-        # Early stopping
-        if patience_counter >= patience:
-            print("Early stopping triggered.")
-            break
-
-    print("Training complete.")

@@ -1,11 +1,9 @@
 import os
-
 import numpy as np
 import pandas as pd
 import torch
 from sklearn.datasets import load_sample_image
-
-from code_data_models.pycharm_code import MLP_class
+import MLP_class
 
 
 class training_sample:
@@ -20,12 +18,11 @@ class training_sample:
 
     def decode_sample(self, filename):
         filename = os.path.basename(filename)
-        print(filename)
-        filename.split("_")
-        T = filename[0]
-        A = filename[1]
-        B = filename[2]
-        C = filename[3]
+        info = filename.split("_")
+        T = info[0]
+        A = info[1]
+        B = info[2]
+        C = info[3]
         C = C.removesuffix(".txt")
         return [T, A, B, C]
 
@@ -53,6 +50,27 @@ class training_sample:
         targets = torch.from_numpy(targets.to_numpy(dtype=np.float32))
         return features, targets
 
+    def return_as_flat_df(self, feature_columns = ['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75'], target_columns = ['T', 'A', 'B', 'C']):
+        features = self.data[feature_columns]
+        targets = self.data[target_columns]
+        targets = targets.iloc[:1]
+        features = features.values.reshape(1, -1)
+        targets = targets.values.reshape(1, -1)
+        features = pd.DataFrame(features)
+        targets = pd.DataFrame(targets)
+        return features, targets
+
+    def return_as_flat_tensors(self,feature_columns=['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75'],target_columns=['T', 'A', 'B', 'C']):
+        features = self.data[feature_columns]
+        targets = self.data[target_columns]
+        features = torch.from_numpy(features.to_numpy(dtype=np.float32))
+        targets = torch.from_numpy(targets.to_numpy(dtype=np.float32))
+        features = features.reshape(1, -1)
+        targets = targets[:1]
+        targets = targets.reshape(1, -1)
+
+        return features, targets
+
     def features_as_tensors(self, feature_columns = ['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75']):
         features = self.data[feature_columns]
         features = torch.from_numpy(features.to_numpy(dtype=np.float32))
@@ -73,13 +91,23 @@ class training_sample:
         data = scaler.transform(data)
         return data
 
-    """def predict_median(self):
-        data = data.median(axis=0)
-        return data
+    def get_sample_info(self):
+        return self.T, self.A, self.B, self.C
+
+    def print_sample_info(self):
+        print(f'T: {self.T}, A: {self.A}, B: {self.B}, C: {self.C}')
+
+
+    def predict_median(self, model, features, output_size):
+        model = MLP_class.MLP.create_and_load(model, features.shape[1], output_size)
+        model.eval()
+        features_as_tensors = self.features_as_tensors(features)
+        with torch.no_grad():
+            predictions = model(features_as_tensors)
+        predictions = predictions.flatten().tolist()
+        median = np.median(predictions)
+        return median
   
-    def predict_rows(self):
-        data = data.iloc[0]
-        return data
 
     def get_rmse_mean(self, data):
         data = np.sqrt(np.mean((data - data.mean()) ** 2))
@@ -87,4 +115,29 @@ class training_sample:
 
     def get_rmse_median(self, data):
         data = np.sqrt(np.mean((data - data.median()) ** 2))
-        return data"""
+        return data
+
+    def return_flattened(self):
+        data = self.data
+        data.drop("T", axis=1, inplace=True)
+        data.drop("A", axis=1, inplace=True)
+        data.drop("B", axis=1, inplace=True)
+        data.drop("C", axis=1, inplace=True)
+        data.values.flatten()
+        return data
+
+
+"""folder = os.path.dirname(os.path.abspath(__file__))
+parent_folder = os.path.dirname(folder)
+folder_path = os.path.join(parent_folder,"datasets", "new_Si_jaw_delta", "21.715_1.2804_0.01391429_0.0000898734.txt")
+training_sample = training_sample(folder_path)
+model = MLP_class.MLP(input_size=497, output_size=1, hidden_layers=[256, 128, 64, 32])
+model.eval()
+with torch.no_grad():
+    pred = model(training_sample.return_as_flat_tensors(feature_columns=['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75'], target_columns=['T'])[0])
+
+print(pred)
+
+"""
+
+
