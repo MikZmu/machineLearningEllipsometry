@@ -29,6 +29,7 @@ class MLP(nn.Module):
 
     @staticmethod
     def decode_model(model_path):
+        model_path = os.path.basename(model_path)
         model = model_path.removesuffix(".pth")
         layers = model.split('_')
         layers.pop(0)

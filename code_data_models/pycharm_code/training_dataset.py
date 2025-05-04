@@ -114,6 +114,24 @@ class training_dataset:
         training_class.train_model(model, loss, optimizer, data[0], data[2], data[1], data[3], save_path=save_path, batch_size=0)
 
 
+    def train(self, model_name = "default", feature_columns=['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75'], target_columns = ['T'], hidden_layers = [64, 32, 32, 16], loss = nn.MSELoss(), save_folder = "models"):
+
+        data = self.return_as_tensors_split(feature_columns, target_columns)
+
+        if model_name == "default":
+            code_layers = ""
+            for layer in hidden_layers:
+                code_layers += str(layer) + "_"
+            code_layers = code_layers[:-1]
+            model_name = "model" + str(target_columns) + "_" + str(code_layers) + ".pth"
+
+        model = MLP_class.MLP(input_size=497, output_size=4, hidden_layers=hidden_layers)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+        save_path = os.path.join(save_folder, model_name)
+        os.makedirs(save_folder, exist_ok=True)
+        training_class.train_model(model, loss, optimizer, data[0], data[2], data[1], data[3], save_path=save_path, batch_size=0)
+
+
 
 
 
@@ -123,5 +141,4 @@ folder = os.path.dirname(os.path.abspath(__file__))
 parent_folder = os.path.dirname(folder)
 folder_path = os.path.join(parent_folder,"datasets", "new_Si_jaw_delta", "")
 dataset = training_dataset(folder_path)
-dataset.train_flattened(model_name="model_flat_TABC.pth", feature_columns=['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75'], target_columns=['T','A','B','C'], hidden_layers=[512, 256, 128, 64], loss=nn.MSELoss(), save_folder="models")
-#dataset.return_as_flat_tensors(feature_columns=['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75'], target_columns=['T', 'A', 'B', 'C'])
+training_dataset.get_total_r2_score()

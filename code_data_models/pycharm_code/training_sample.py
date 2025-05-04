@@ -127,17 +127,6 @@ class training_sample:
         return data
 
 
-"""folder = os.path.dirname(os.path.abspath(__file__))
-parent_folder = os.path.dirname(folder)
-folder_path = os.path.join(parent_folder,"datasets", "new_Si_jaw_delta", "21.715_1.2804_0.01391429_0.0000898734.txt")
-training_sample = training_sample(folder_path)
-model = MLP_class.MLP(input_size=497, output_size=1, hidden_layers=[256, 128, 64, 32])
-model.eval()
-with torch.no_grad():
-    pred = model(training_sample.return_as_flat_tensors(feature_columns=['wavelength', 'psi65', 'del65', 'psi70', 'del70', 'psi75', 'del75'], target_columns=['T'])[0])
 
-print(pred)
-
-"""
 
 

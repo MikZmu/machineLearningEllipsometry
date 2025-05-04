@@ -18,7 +18,6 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
     model = model.to(device)
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
     if batch_size != 0:
         dataset = torch.utils.data.TensorDataset(x_train, y_train)
         test_dataset = torch.utils.data.TensorDataset(x_test, y_test)
