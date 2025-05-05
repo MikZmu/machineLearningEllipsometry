@@ -52,11 +52,11 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
             # Validation
             #model.eval()
 
-            if loss.item() < best_loss:
-                best_loss = loss.item()
+            if loss.detach().item() < best_loss:
+                best_loss = loss.detach().item()
                 torch.save(model.state_dict(), save_path)
                 print(f"New best loss: {best_loss:.8f}. Model saved to {save_path}.")
-            print(f"Current Loss: {loss.item():.8f}")
+            print(f"Current Loss: {loss.detach().item():.8f}")
             print(f"Current R2 Loss: {r2:.8f}")
 
     else:
@@ -91,7 +91,7 @@ def train_model(model, loss_fn, optimizer, x_train, y_train, x_test, y_test, sav
 
 
 
-            if loss.item() < best_loss:
+            if loss.detach().item() < best_loss:
                 best_loss = loss.item()
                 torch.save(model.state_dict(), save_path)
                 print(f"New best loss: {best_loss:.4f}. Model saved to {save_path}.")
