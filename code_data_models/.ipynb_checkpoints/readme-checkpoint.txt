@@ -18,3 +18,12 @@ training_sample:
 
 training_data:
     notebook contains class that describes and contains functions that perform actions on training data. it is constituded by list of samples and contains functions that perform actions on whole set of data. from this class training can be performed and scalers for different variables can be generated. 
+
+model_training:
+    it is used to train the model. it saves model version with lowest loss value. it allows you to choose optimizer and leraning rate.
+
+model_creator:
+    it is used to create the model that is used for training. it allows you to determine the number of neurons in each layer and the activation function. loss is set to MSE by default.
+
+working_notebook:
+    contains code written using newly created classes. it is used to test the code and check if everything works as expected.

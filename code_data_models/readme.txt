@@ -24,3 +24,6 @@ model_training:
 
 model_creator:
     it is used to create the model that is used for training. it allows you to determine the number of neurons in each layer and the activation function. loss is set to MSE by default.
+
+working_notebook:
+    contains code written using newly created classes. it is used to test the code and check if everything works as expected.
