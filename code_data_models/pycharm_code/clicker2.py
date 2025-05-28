@@ -8,11 +8,11 @@ from pynput import mouse, keyboard
 aLower = 1.350
 aUpper = 1.550
 aStep = 0.05
-bLower = 0.008 #*100
+bLower = 0.000` #*100
 bUpper = 0.012 #*100
 bStep = 0.0005 #*100
-cLower = 0.00001 #*1000
-cUpper = 0.00002 #*1000
+cLower = 0.00000 #*1000
+cUpper = 0.00004 #*1000
 cStep = 0.00003 #*1000
 tLower = 1
 tUpper = 200
@@ -55,52 +55,6 @@ def delete():
 #while True:
  #   time.sleep(1)
    # print(pyautogui.position())
-
-
-def execute():
-    total = len(aList) * len(bList) * len(cList) * len(tList)
-    progress = 0
-    for A in aList:
-        for B in bList:
-                for T in tList:
-                    pyautogui.click(68, 163)
-                    time.sleep(0.1)
-                    pyautogui.doubleClick(909,485)
-                    delete()
-                    pyautogui.typewrite(str(T))
-                    pyautogui.doubleClick(940, 550)
-                    delete()
-                    pyautogui.typewrite(str(A))
-                    pyautogui.doubleClick(940, 592)
-                    delete()
-                    pyautogui.typewrite(str(B))
-                    pyautogui.doubleClick(940, 634)
-                    delete()
-                    pyautogui.typewrite(str(0.0001))
-                    pyautogui.click(1147,489)
-                    pyautogui.rightClick(62, 561)
-                    time.sleep(1)
-                    pyautogui.click(178, 647)
-                    time.sleep(1)
-                    pyautogui.rightClick(1456,814)
-                    time.sleep(0.1)
-                    pyautogui.click(1641, 656)
-                    time.sleep(0.1)
-                    pyautogui.click(1207, 758)
-                    time.sleep(0.1)
-                    pyautogui.click(659, 788)
-                    time.sleep(0.1)
-                    pyautogui.click(622, 784)
-                    time.sleep(0.1)
-                    pyautogui.typewrite(str(T) + "_" + str(A) + "_" + str(B)[:6] + "_" + str(0.0001)[:8])
-                    pyautogui.click(646, 745)
-                    pyautogui.click(1171, 869)
-
-                    time.sleep(0.2)  # Adjust the delay as needed
-                    #progress = A * B * C * T
-                    #print("Progress: {}/{}".format(progress, total))
-                    #print("A: {}, B: {}, C: {}, T: {}".format(A, B, C, T))
-
 #execute()
 # pyautogui.click(x, y) kliknięcie na miejsce
 # time.sleep() opóźnienie
@@ -147,7 +101,7 @@ for x in sets:
     pyautogui.typewrite(str(x[2])[:6])
     pyautogui.doubleClick(coords[5][0], coords[5][1])
     delete()
-    pyautogui.typewrite(str(x[3])[:6])
+    pyautogui.typewrite(str(x[3])[:10])
     pyautogui.click(coords[6][0], coords[6][1])
     pyautogui.rightClick(coords[7][0], coords[7][1])
     pyautogui.click(coords[8][0], coords[8][1])
@@ -162,7 +116,7 @@ for x in sets:
     time.sleep(0.2)
     #pyautogui.click(879, 834)
     #   time.sleep(1)
-    pyautogui.typewrite(str(x[0])[:6] + "_" + str(x[1])[:6] + "_" + str(x[2])[:6] + "_" + str(x[3])[:6])
+    pyautogui.typewrite(str(x[0])[:6] + "_" + str(x[1])[:6] + "_" + str(x[2])[:6] + "_" + str(x[3])[:10])
     pyautogui.click(coords[13][0], coords[13][1])
     pyautogui.click(coords[14][0], coords[14][1])
 
