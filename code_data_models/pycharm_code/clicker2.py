@@ -8,7 +8,7 @@ from pynput import mouse, keyboard
 aLower = 1.350
 aUpper = 1.550
 aStep = 0.05
-bLower = 0.000` #*100
+bLower = 0.000`  #*100
 bUpper = 0.012 #*100
 bStep = 0.0005 #*100
 cLower = 0.00000 #*1000
